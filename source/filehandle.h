@@ -208,14 +208,12 @@ protected:
 	virtual bool renewCache() = 0;
 
 	bool last_was_start;
-	uint8_t* cache;
+	std::unique_ptr<uint8_t[]> cache;
 	size_t cache_size;
 	size_t cache_length;
 	size_t local_read_index;
 
 	BinaryNode* root_node;
-
-	std::stack<void*> unused;
 
 	friend class BinaryNode;
 };
@@ -336,7 +334,7 @@ protected:
 	static uint8_t NODE_END;
 	static uint8_t ESCAPE_CHAR;
 
-	uint8_t* cache;
+	std::unique_ptr<uint8_t[]> cache;
 	size_t cache_size;
 	size_t local_write_index;
 
