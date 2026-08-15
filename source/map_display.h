@@ -63,8 +63,14 @@ public:
 	void UpdateZoomStatus();
 	void ChangeFloor(int new_floor);
 	void SetFloor(int new_floor) {
+		floor = new_floor;
+	}
 	int GetFloor() const {
+		return floor;
+	}
 	double GetZoom() const {
+		return zoom;
+	}
 	virtual void SetZoom(double value);
 	virtual void GetViewBox(int* view_scroll_x, int* view_scroll_y, int* screensize_x, int* screensize_y) const;
 	virtual Position GetCursorPosition() const;
