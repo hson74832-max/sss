@@ -1,3 +1,0 @@
-/workspace/build/_deps/cpr-subbuild/CMakeFiles/cpr-populate.dir
-/workspace/build/_deps/cpr-subbuild/CMakeFiles/edit_cache.dir
-/workspace/build/_deps/cpr-subbuild/CMakeFiles/rebuild_cache.dir

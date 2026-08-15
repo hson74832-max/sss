@@ -108,6 +108,11 @@ EVT_MENU_RANGE(MAP_POPUP_MENU_SCRIPT_FIRST, MAP_POPUP_MENU_SCRIPT_LAST, MapCanva
 END_EVENT_TABLE()
 
 bool MapCanvas::processed[] = { 0 };
+int MapCanvas::countMaxFills = 0;
+
+int MapCanvas::getFillIndex(int x, int y) {
+	return y * BLOCK_SIZE + x;
+}
 
 MapCanvas::MapCanvas(wxWindow* parent, Editor& editor, int* attriblist) :
 	wxGLCanvas(parent, wxID_ANY, nullptr, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS),
