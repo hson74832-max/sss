@@ -183,6 +183,7 @@ public:
 	void TakeScreenshot(wxFileName path, wxString format);
 	void MouseToMap(int* map_x, int* map_y) {
 		wxPoint pos = wxGetMousePosition();
+		pos = ScreenToClient(pos);
 		ScreenToMap(pos.x, pos.y, map_x, map_y);
 	}
 
