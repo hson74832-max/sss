@@ -216,6 +216,7 @@ protected:
 	BinaryNode* root_node;
 
 	friend class BinaryNode;
+	friend class DiskNodeFileReadHandle;
 };
 
 class DiskNodeFileReadHandle : public NodeFileReadHandle {
@@ -267,6 +268,8 @@ protected:
 	virtual bool renewCache();
 
 	uint8_t* index;
+
+	friend class BinaryNode;
 };
 
 class FileWriteHandle : public FileHandle {
