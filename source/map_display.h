@@ -57,10 +57,13 @@ private:
 	wxLongLong m_last_time;
 	uint32_t m_frame_count;
 	wxLongLong m_fps_timer;
-	int floor;
-	double zoom;
 
 protected:
+	// State variables - protected for access by derived classes and MapDrawer
+	int floor;
+	double zoom;
+	Editor& editor;
+	
 	// Drawing state - protected for access by MapDrawer
 	bool dragging;
 	bool dragging_draw;
@@ -180,9 +183,12 @@ public:
 	// Additional methods needed by map_display.cpp
 	bool isPasting() const;
 	void getTilesToDraw(int mouse_map_x, int mouse_map_y, int floor, PositionVector* tilestodraw, PositionVector* tilestoborder = nullptr, bool fill = false);
-
-protected:
-	Editor& editor;
+	
+	// Flood fill support - declared here for map_display.cpp
+	static constexpr int BLOCK_SIZE = 64;
+	static int countMaxFills;
+	static int getFillIndex(int x, int y);
+	bool floodFill(Map* map, const Position& center, int x, int y, GroundBrush* brush, PositionVector* positions);
 };
 
 class AnimationTimer : public wxTimer {

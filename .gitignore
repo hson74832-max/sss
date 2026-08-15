@@ -1,57 +1,21 @@
-```c
-// C/C++ build artifacts
-*.o
-*.obj
-*.a
-*.lib
-*.so
-*.dll
-*.dylib
-*.exe
-*.out
-
-// Debug and release builds
-Debug/
-Release/
-x64/
-x86/
-
-// IDE specific
-.vs/
-*.vcxproj.user
-*.sln.db
-ipch/
-Debug/
-Release/
-
-// Temporary files
-*.tmp
-*.bak
-*.~*
-*~
-
-// Log files
-*.log
-
-// Dependencies (if any C++ package managers used)
-vcpkg_installed/
-conan/
+```
+# Build artifacts and temporary files
 build/
-cmake-build-*/
+*.log
+*.bin
+*.tmp
 
-// Qt specific (if applicable)
-moc_*.cpp
-qrc_*.cpp
-ui_*.h
-*.qm
+# Dependencies downloaded by CMake FetchContent
+_deps/
 
-// General build directories
-bin/
-obj/
-lib/
-target/
+# CMake build system files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
 
-// Configuration
-*.swp
-*.swo
+# Compressed archives
+*.tar.xz
+*.tar.gz
+
 ```
