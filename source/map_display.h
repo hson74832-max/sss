@@ -25,11 +25,20 @@
 class Item;
 class Creature;
 class MapWindow;
-class MapPopupMenu;
+class MapPopupMenu : public wxMenu {
+public:
+	MapPopupMenu(Editor& editor);
+	~MapPopupMenu();
+	void Update();
+	
+	Editor& editor;
+};
 class AnimationTimer;
 class MapDrawer;
 
 class MapCanvas : public wxGLCanvas {
+	DECLARE_CLASS(MapCanvas)
+	DECLARE_EVENT_TABLE()
 public:
 	MapCanvas(wxWindow* parent, Editor& editor, int* attriblist);
 	virtual ~MapCanvas();
@@ -50,8 +59,9 @@ private:
 	wxLongLong m_fps_timer;
 	int floor;
 	double zoom;
-	
-	// Drawing state
+
+protected:
+	// Drawing state - protected for access by MapDrawer
 	bool dragging;
 	bool dragging_draw;
 	bool is_pasting;
@@ -59,6 +69,24 @@ private:
 	int last_click_abs_x, last_click_abs_y;
 	int cursor_x, cursor_y;
 	int last_click_map_x, last_click_map_y;
+	
+	// Additional state variables needed by map_display.cpp
+	static bool processed[];
+	bool boundbox_selection;
+	bool screendragging;
+	bool drawing;
+	bool replace_dragging;
+	uint8_t* screenshot_buffer;
+	int last_cursor_map_x, last_cursor_map_y, last_cursor_map_z;
+	int last_click_map_z;
+	int last_click_x, last_click_y;
+	int last_mmb_click_x, last_mmb_click_y;
+	MapPopupMenu* popup_menu;
+	AnimationTimer* animation_timer;
+	MapDrawer* drawer;
+	int keyCode;
+	wxStopWatch refresh_watch;
+	int view_scroll_x, view_scroll_y;
 
 public:
 	void Refresh();
@@ -148,6 +176,10 @@ public:
 	// ---
 	void OnProperties(wxCommandEvent& event);
 	void OnScriptMenu(wxCommandEvent& event);
+	
+	// Additional methods needed by map_display.cpp
+	bool isPasting() const;
+	void getTilesToDraw(int mouse_map_x, int mouse_map_y, int floor, PositionVector* tilestodraw, PositionVector* tilestoborder = nullptr, bool fill = false);
 
 protected:
 	Editor& editor;
