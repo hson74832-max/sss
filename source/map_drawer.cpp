@@ -267,7 +267,7 @@ static bool mapToScreen(const MapDrawer* drawer, int map_x, int map_y, int map_z
 	return true;
 }
 
-static void DrawDirectText(int x, int y, const std::string& text, const wxColor& color) {
+static void DrawDirectText(int x, int y, const std::string& text, const ColorRGBA& color) {
 	// Drop shadow
 	glColor4ub(0, 0, 0, 255);
 	glRasterPos2i(x + 1, y + 13);
@@ -278,7 +278,7 @@ static void DrawDirectText(int x, int y, const std::string& text, const wxColor&
 	}
 
 	// Text
-	glColor4ub(color.Red(), color.Green(), color.Blue(), color.Alpha());
+	glColor4ub(color.r, color.g, color.b, color.a);
 	glRasterPos2i(x, y + 12);
 	for (const char* c = text.c_str(); *c != '\0'; c++) {
 		if (*c != '\n') {
@@ -371,7 +371,7 @@ bool MapDrawer::drawOverlayCommands(const std::vector<MapOverlayCommand>& comman
 			}
 
 			glLineWidth(cmd.width);
-			glColor4ub(cmd.color.Red(), cmd.color.Green(), cmd.color.Blue(), cmd.color.Alpha());
+			glColor4ub(cmd.color.r, cmd.color.g, cmd.color.b, cmd.color.a);
 			glBegin(GL_LINES);
 			glVertex2f(x1, y1);
 			glVertex2f(x2, y2);
@@ -390,7 +390,7 @@ bool MapDrawer::drawOverlayCommands(const std::vector<MapOverlayCommand>& comman
 					int screen_y = 0;
 					if (mapToScreen(this, cmd.x, cmd.y, cmd.z, screen_x, screen_y)) {
 						glEnable(GL_TEXTURE_2D);
-						BlitSpriteType(screen_x, screen_y, cmd.sprite_id, cmd.color.Red(), cmd.color.Green(), cmd.color.Blue(), cmd.color.Alpha());
+						BlitSpriteType(screen_x, screen_y, cmd.sprite_id, cmd.color.r, cmd.color.g, cmd.color.b, cmd.color.a);
 						glDisable(GL_TEXTURE_2D);
 					}
 				}
@@ -405,7 +405,7 @@ bool MapDrawer::drawOverlayCommands(const std::vector<MapOverlayCommand>& comman
 					int screen_x = 0;
 					int screen_y = 0;
 					if (mapToScreen(this, cmd.x, cmd.y, cmd.z, screen_x, screen_y)) {
-						MakeTooltip(screen_x, screen_y, cmd.text, cmd.color.Red(), cmd.color.Green(), cmd.color.Blue());
+						MakeTooltip(screen_x, screen_y, cmd.text, cmd.color.r, cmd.color.g, cmd.color.b);
 						hasTooltips = true;
 					}
 				}
@@ -433,7 +433,7 @@ bool MapDrawer::addOverlayTooltips(const std::vector<MapOverlayTooltip>& tooltip
 		}
 
 		if (!tooltip.text.empty()) {
-			MakeTooltip(screen_x, screen_y, tooltip.text, tooltip.color.Red(), tooltip.color.Green(), tooltip.color.Blue());
+			MakeTooltip(screen_x, screen_y, tooltip.text, tooltip.color.r, tooltip.color.g, tooltip.color.b);
 			hasTooltips = true;
 		}
 	}
@@ -2218,9 +2218,9 @@ void MapDrawer::glColorCheck(Brush* brush, const Position& pos) {
 	}
 }
 
-void MapDrawer::drawRect(int x, int y, int w, int h, const wxColor& color, int width) {
+void MapDrawer::drawRect(int x, int y, int w, int h, const ColorRGBA& color, int width) {
 	glLineWidth(width);
-	glColor4ub(color.Red(), color.Green(), color.Blue(), color.Alpha());
+	glColor4ub(color.r, color.g, color.b, color.a);
 	glBegin(GL_LINE_STRIP);
 	glVertex2f(x, y);
 	glVertex2f(x + w, y);
@@ -2230,8 +2230,8 @@ void MapDrawer::drawRect(int x, int y, int w, int h, const wxColor& color, int w
 	glEnd();
 }
 
-void MapDrawer::drawFilledRect(int x, int y, int w, int h, const wxColor& color) {
-	glColor4ub(color.Red(), color.Green(), color.Blue(), color.Alpha());
+void MapDrawer::drawFilledRect(int x, int y, int w, int h, const ColorRGBA& color) {
+	glColor4ub(color.r, color.g, color.b, color.a);
 	glBegin(GL_QUADS);
 	glVertex2f(x, y);
 	glVertex2f(x + w, y);
