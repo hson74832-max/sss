@@ -710,8 +710,8 @@ void GroundBrush::doBorders(BaseMap* map, Tile* tile) {
 		neighbours[7] = { false, extractGroundBrushFromTile(map, x + 1, y + 1, z) };
 	}
 
-	static std::vector<const BorderBlock*> specificList;
-	specificList.clear();
+	std::vector<const BorderBlock*> specificList;
+	specificList.reserve(8);
 
 	std::vector<BorderCluster> borderList;
 	for (int32_t i = 0; i < 8; ++i) {
