@@ -675,7 +675,7 @@ void MapDrawer::DrawIngameBox() {
 	int box_end_x = box_end_map_x * TileSize - view_scroll_x;
 	int box_end_y = box_end_map_y * TileSize - view_scroll_y;
 
-	static wxColor side_color(0, 0, 0, 200);
+	static ColorRGBA side_color(0, 0, 0, 200);
 
 	glDisable(GL_TEXTURE_2D);
 
@@ -904,12 +904,13 @@ void MapDrawer::DrawLiveCursors() {
 		}
 
 		if (cursor.pos.z < floor) {
-			cursor.color = wxColor(
+			ColorRGBA cursorColor = ColorRGBA(
 				cursor.color.Red(),
 				cursor.color.Green(),
 				cursor.color.Blue(),
 				std::max<uint8_t>(cursor.color.Alpha() / 2, 64)
 			);
+			cursor.color = cursorColor;
 		}
 
 		int offset;
@@ -1439,10 +1440,10 @@ void MapDrawer::BlitItem(int& draw_x, int& draw_y, const Position& pos, Item* it
 	if (!options.ingame && options.show_light_str) {
 		const SpriteLight& light = item->getLight();
 		if (light.intensity > 0) {
-			wxColor lightColor = colorFromEightBit(light.color);
-			uint8_t byteR = lightColor.Red();
-			uint8_t byteG = lightColor.Green();
-			uint8_t byteB = lightColor.Blue();
+			ColorRGBA lightColor = colorFromEightBitRGBA(light.color);
+			uint8_t byteR = lightColor.r;
+			uint8_t byteG = lightColor.g;
+			uint8_t byteB = lightColor.b;
 			uint8_t byteA = 255;
 
 			int startOffset = std::max<int>(16, 32 - light.intensity);
@@ -2165,10 +2166,6 @@ void MapDrawer::glBlitSquare(int sx, int sy, int red, int green, int blue, int a
 
 void MapDrawer::glColor(const ColorRGBA& color) {
 	glColor4ub(color.r, color.g, color.b, color.a);
-}
-
-void MapDrawer::glColor(wxColor color) {
-	glColor4ub(color.Red(), color.Green(), color.Blue(), color.Alpha());
 }
 
 void MapDrawer::glColor(MapDrawer::BrushColor color) {

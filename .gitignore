@@ -1,1 +1,18 @@
-(source/map_renderer.cpp, source/map_renderer.h)
+```
+# CMake build artifacts
+build/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Dependencies downloaded by CMake
+_deps/
+
+# Source files that were modified (should not be ignored)
+# source/map_drawer.cpp
+# source/map_drawer.h
+# source/map_renderer.cpp
+# source/map_renderer.h
+
+```
