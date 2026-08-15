@@ -2,5 +2,7 @@
 # Build artifacts
 build/
 CMakeFiles/
+
+# Logs
 *.log
 ```
