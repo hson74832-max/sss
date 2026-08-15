@@ -54,7 +54,11 @@ public:
 	virtual void ScreenToMap(int screen_x, int screen_y, int* map_x, int* map_y);
 	virtual void GetScreenCenter(int* map_x, int* map_y);
 	virtual int GetClientWidth() const {
+		return wxGLCanvas::GetClientSize().GetWidth();
+	}
 	virtual int GetClientHeight() const {
+		return wxGLCanvas::GetClientSize().GetHeight();
+	}
 	void StartPasting();
 	void EndPasting();
 	void EnterSelectionMode();
@@ -75,7 +79,10 @@ public:
 	virtual void GetViewBox(int* view_scroll_x, int* view_scroll_y, int* screensize_x, int* screensize_y) const;
 	virtual Position GetCursorPosition() const;
 	void TakeScreenshot(wxFileName path, wxString format);
-        void MouseToMap(int* map_x, int* map_y) {
+	void MouseToMap(int* map_x, int* map_y) {
+		wxPoint pos = wxGetMousePosition();
+		ScreenToMap(pos.x, pos.y, map_x, map_y);
+	}
 
 	void OnMouseMove(wxMouseEvent& event);
 	void OnMouseLeftRelease(wxMouseEvent& event);
