@@ -48,6 +48,8 @@ private:
 	wxLongLong m_last_time;
 	uint32_t m_frame_count;
 	wxLongLong m_fps_timer;
+	int floor;
+	double zoom;
 
 public:
 	void Refresh();
