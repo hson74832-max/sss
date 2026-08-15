@@ -48,15 +48,13 @@ int32_t uniform_random(int32_t maxNumber) {
 
 //
 std::string i2s(const int _i) {
-	static std::stringstream ss;
-	ss.str("");
+	std::stringstream ss;
 	ss << _i;
 	return ss.str();
 }
 
 std::string f2s(const double _d) {
-	static std::stringstream ss;
-	ss.str("");
+	std::stringstream ss;
 	ss << _d;
 	return ss.str();
 }
