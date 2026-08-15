@@ -459,9 +459,9 @@ void BinaryNode::load() {
 		// Memory-based file handle - read directly from the provided buffer
 		const uint8_t* buffer = memFile->index;
 		size_t buffer_size = memFile->cache_size;
-		while (local_read_index < buffer_size) {
-			uint8_t op = buffer[local_read_index];
-			++local_read_index;
+		while (file->local_read_index < buffer_size) {
+			uint8_t op = buffer[file->local_read_index];
+			++file->local_read_index;
 
 			switch (op) {
 				case NODE_START: {
@@ -475,12 +475,12 @@ void BinaryNode::load() {
 				}
 
 				case ESCAPE_CHAR: {
-					if (local_read_index >= buffer_size) {
+					if (file->local_read_index >= buffer_size) {
 						file->error_code = FILE_PREMATURE_END;
 						return;
 					}
-					op = buffer[local_read_index];
-					++local_read_index;
+					op = buffer[file->local_read_index];
+					++file->local_read_index;
 					break;
 				}
 
