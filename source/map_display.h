@@ -50,6 +50,15 @@ private:
 	wxLongLong m_fps_timer;
 	int floor;
 	double zoom;
+	
+	// Drawing state
+	bool dragging;
+	bool dragging_draw;
+	bool is_pasting;
+	int drag_start_x, drag_start_y, drag_start_z;
+	int last_click_abs_x, last_click_abs_y;
+	int cursor_x, cursor_y;
+	int last_click_map_x, last_click_map_y;
 
 public:
 	void Refresh();
