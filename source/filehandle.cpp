@@ -21,6 +21,8 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <vector>
+#include <memory>
 
 uint8_t NodeFileWriteHandle::NODE_START = ::NODE_START;
 uint8_t NodeFileWriteHandle::NODE_END = ::NODE_END;
@@ -147,29 +149,14 @@ NodeFileReadHandle::NodeFileReadHandle() :
 	////
 }
 
-NodeFileReadHandle::~NodeFileReadHandle() {
-	while (!unused.empty()) {
-		free(unused.top());
-		unused.pop();
-	}
-}
+NodeFileReadHandle::~NodeFileReadHandle() = default;
 
 BinaryNode* NodeFileReadHandle::getNode(BinaryNode* parent) {
-	void* mem;
-	if (unused.empty()) {
-		mem = malloc(sizeof(BinaryNode));
-	} else {
-		mem = unused.top();
-		unused.pop();
-	}
-	return new (mem) BinaryNode(this, parent);
+	return new BinaryNode(this, parent);
 }
 
 void NodeFileReadHandle::freeNode(BinaryNode* node) {
-	if (node) {
-		node->~BinaryNode();
-		unused.push(node);
-	}
+	delete node;
 }
 
 //=============================================================================
@@ -262,14 +249,14 @@ void DiskNodeFileReadHandle::close() {
 	freeNode(root_node);
 	file_size = 0;
 	FileHandle::close();
-	free(cache);
+	cache.reset();
 }
 
 bool DiskNodeFileReadHandle::renewCache() {
 	if (!cache) {
-		cache = (uint8_t*)malloc(cache_size);
+		cache = std::make_unique<uint8_t[]>(cache_size);
 	}
-	cache_length = fread(cache, 1, cache_size, file);
+	cache_length = fread(cache.get(), 1, cache_size, file);
 
 	if (cache_length == 0 || ferror(file)) {
 		return false;
@@ -324,7 +311,7 @@ bool BinaryNode::getRAW(uint8_t* ptr, size_t sz) {
 		read_offset = data.size();
 		return false;
 	}
-	memcpy(ptr, data.data() + read_offset, sz);
+	std::copy(data.begin() + read_offset, data.begin() + read_offset + sz, ptr);
 	read_offset += sz;
 	return true;
 }
@@ -540,9 +527,7 @@ DiskNodeFileWriteHandle::DiskNodeFileWriteHandle(const std::string& name, const 
 	}
 
 	fwrite(identifier.c_str(), 1, 4, file);
-	if (!cache) {
-		cache = (uint8_t*)malloc(cache_size + 1);
-	}
+	cache = std::make_unique<uint8_t[]>(cache_size + 1);
 	local_write_index = 0;
 }
 
@@ -561,12 +546,12 @@ void DiskNodeFileWriteHandle::close() {
 
 void DiskNodeFileWriteHandle::renewCache() {
 	if (cache) {
-		fwrite(cache, local_write_index, 1, file);
+		fwrite(cache.get(), local_write_index, 1, file);
 		if (ferror(file) != 0) {
 			error_code = FILE_WRITE_ERROR;
 		}
 	} else {
-		cache = (uint8_t*)malloc(cache_size + 1);
+		cache = std::make_unique<uint8_t[]>(cache_size + 1);
 	}
 	local_write_index = 0;
 }
@@ -575,9 +560,7 @@ void DiskNodeFileWriteHandle::renewCache() {
 // Memory based node file write handle
 
 MemoryNodeFileWriteHandle::MemoryNodeFileWriteHandle() {
-	if (!cache) {
-		cache = (uint8_t*)malloc(cache_size + 1);
-	}
+	cache = std::make_unique<uint8_t[]>(cache_size + 1);
 	local_write_index = 0;
 }
 
@@ -586,17 +569,16 @@ MemoryNodeFileWriteHandle::~MemoryNodeFileWriteHandle() {
 }
 
 void MemoryNodeFileWriteHandle::reset() {
-	memset(cache, 0xAA, cache_size);
+	std::fill(cache.get(), cache.get() + cache_size, 0xAA);
 	local_write_index = 0;
 }
 
 void MemoryNodeFileWriteHandle::close() {
-	free(cache);
-	cache = nullptr;
+	cache.reset();
 }
 
 uint8_t* MemoryNodeFileWriteHandle::getMemory() {
-	return cache;
+	return cache.get();
 }
 
 size_t MemoryNodeFileWriteHandle::getSize() {
@@ -606,12 +588,11 @@ size_t MemoryNodeFileWriteHandle::getSize() {
 void MemoryNodeFileWriteHandle::renewCache() {
 	if (cache) {
 		cache_size = cache_size * 2;
-		cache = (uint8_t*)realloc(cache, cache_size);
-		if (!cache) {
-			exit(1);
-		}
+		auto newCache = std::make_unique<uint8_t[]>(cache_size);
+		std::copy(cache.get(), cache.get() + cache_size / 2, newCache.get());
+		cache = std::move(newCache);
 	} else {
-		cache = (uint8_t*)malloc(cache_size + 1);
+		cache = std::make_unique<uint8_t[]>(cache_size + 1);
 	}
 }
 
@@ -625,9 +606,7 @@ NodeFileWriteHandle::NodeFileWriteHandle() :
 	////
 }
 
-NodeFileWriteHandle::~NodeFileWriteHandle() {
-	free(cache);
-}
+NodeFileWriteHandle::~NodeFileWriteHandle() = default;
 
 bool NodeFileWriteHandle::addNode(uint8_t nodetype) {
 	cache[local_write_index++] = NODE_START;

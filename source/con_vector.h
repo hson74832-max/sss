@@ -18,6 +18,9 @@
 #ifndef RME_CON_VECTOR_H_
 #define RME_CON_VECTOR_H_
 
+#include <vector>
+#include <algorithm>
+
 #define REALLOC_INCREASE 600
 
 template <class T> // This only really works with pointers.. hrhr "T" might be abit misleading.. :o
@@ -27,37 +30,30 @@ class contigous_vector {
 	} // If this fails, you have tried using this class with a non-pointer type, DONT
 public:
 	contigous_vector(size_t start_size = 7) {
-		start = reinterpret_cast<T*>(malloc(sizeof(T) * start_size));
-		memset(start, 0, sizeof(T) * start_size);
-		sz = start_size;
+		vec.resize(start_size, nullptr);
 	}
-	~contigous_vector() {
-		free(start);
-	}
+	~contigous_vector() = default;
 
 	void resize(size_t new_size) {
-		size_t old_size = sz;
-		start = reinterpret_cast<T*>(realloc(start, sizeof(T) * new_size));
-		memset(start + old_size, 0, sizeof(T) * (new_size - old_size));
-		sz = new_size;
+		vec.resize(new_size, nullptr);
 	}
-	size_t size() {
-		return sz;
+	size_t size() const {
+		return vec.size();
 	}
 
 	T& locate(size_t index) {
 		// Masterly inefficient!
-		while (index >= sz) {
-			resize(sz + REALLOC_INCREASE);
+		if (index >= vec.size()) {
+			vec.resize(index + REALLOC_INCREASE, nullptr);
 		}
-		return start[index];
+		return vec[index];
 	}
 
 	T at(size_t index) const {
-		if (index >= sz) {
+		if (index >= vec.size()) {
 			return nullptr;
 		}
-		return start[index];
+		return vec[index];
 	}
 
 	void set(size_t index, T value) {
@@ -72,8 +68,7 @@ public:
 	}
 
 private:
-	T* start;
-	size_t sz;
+	std::vector<T> vec;
 };
 
 #endif

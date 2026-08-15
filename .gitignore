@@ -1,51 +1,67 @@
-```cpp
+```
 # Compiled and binary files
 *.o
 *.obj
 *.out
+
+# Dependencies
 *.a
 *.so
 *.dll
 *.exe
 
-# Build directories
+# Build artifacts
 build/
 dist/
-target/
 
-# Dependencies
-node_modules/
-venv/
-.venv/
-__pycache__/
-.mypy_cache/
-.pytest_cache/
+# Logs and temp files
+*.log
+*.tmp
+*.swp
 
-# Editors and IDEs
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
-*.tmp
 
-# Logs
-*.log
+# Environment
+.env
+*.env.*
 
-# Coverage reports
+# Coverage
 coverage/
 htmlcov/
 .coverage
 
-# Environment files
-.env
-.env.local
-*.env.*
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
 
-# OS files
-.DS_Store
-Thumbs.db
+# C/C++
+*.i
+*.ii
+*.s
+*.su
+*.sln
+*.vcxproj
+*.vcproj
+*.user
+*.userosscache
+*.suo
+*.pdb
+*.ilk
+*.dll.a
+*.lib
+*.la
+*.lai
+.libs
+.so.dSYM
+*.dSYM
 
-# Compressed files
+# Compression
 *.zip
 *.gz
 *.tar
