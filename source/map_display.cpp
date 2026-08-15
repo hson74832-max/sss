@@ -107,6 +107,8 @@ EVT_MENU(MAP_POPUP_MENU_BROWSE_TILE, MapCanvas::OnBrowseTile)
 EVT_MENU_RANGE(MAP_POPUP_MENU_SCRIPT_FIRST, MAP_POPUP_MENU_SCRIPT_LAST, MapCanvas::OnScriptMenu)
 END_EVENT_TABLE()
 
+IMPLEMENT_CLASS(MapCanvas, wxGLCanvas)
+
 bool MapCanvas::processed[] = { 0 };
 int MapCanvas::countMaxFills = 0;
 
