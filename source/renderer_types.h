@@ -47,6 +47,15 @@ struct ColorRGBA {
     operator wxColour() const {
         return wxColour(r, g, b, a);
     }
+    
+    // Assignment from wxColour
+    ColorRGBA& operator=(const wxColour& colour) {
+        r = colour.Red();
+        g = colour.Green();
+        b = colour.Blue();
+        a = colour.Alpha();
+        return *this;
+    }
 #endif
 
     bool operator==(const ColorRGBA& other) const {
