@@ -1,24 +1,6 @@
 ```
 # Build artifacts
 build/
-cmake-build*/
-
-# Dependencies
-_deps/
-
-# Logs
-*.log
-
-# CMake
 CMakeFiles/
-CMakeCache.txt
-Makefile
-
-# Temporary files
-*.tmp
-*.swp
-
-# Generated headers
-source/renderer_types.h
-
+*.log
 ```

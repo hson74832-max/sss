@@ -20,6 +20,7 @@
 
 #include "graphics.h"
 #include "position.h"
+#include "renderer_types.h"
 
 class LightDrawer {
 	struct Light {
@@ -59,7 +60,7 @@ private:
 
 	GLuint texture;
 	std::vector<Light> lights;
-	wxColor global_color;
+	ColorRGBA global_color;
 };
 
 #endif

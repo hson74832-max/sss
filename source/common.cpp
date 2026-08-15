@@ -229,3 +229,13 @@ wxColor colorFromEightBit(int color) {
 	const uint8_t blue = (uint8_t)(color % 6 * 51);
 	return wxColor(red, green, blue);
 }
+
+ColorRGBA colorFromEightBitRGBA(int color) {
+	if (color <= 0 || color >= 216) {
+		return ColorRGBA(0, 0, 0, 255);
+	}
+	const uint8_t red = (uint8_t)(int(color / 36) % 6 * 51);
+	const uint8_t green = (uint8_t)(int(color / 6) % 6 * 51);
+	const uint8_t blue = (uint8_t)(color % 6 * 51);
+	return ColorRGBA(red, green, blue, 255);
+}
