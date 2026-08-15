@@ -183,8 +183,8 @@ public:
 		view_x(0),
 		view_y(0) {
 
-		floor = 7;
-		zoom = 1.0;
+		SetFloorPublic(7);
+		SetZoomPublic(1.0);
 
 		// Force Ingame mode for "Client Box" behavior
 		drawer->getOptions().SetIngame();
@@ -202,7 +202,7 @@ public:
 		if (value > 25.00) {
 			value = 25.0;
 		}
-		zoom = value;
+		SetZoomPublic(value);
 		wxGLCanvas::Refresh();
 	}
 
@@ -221,18 +221,18 @@ public:
 		if (screen_x < 0) {
 			*map_x = (view_x + screen_x) / 32;
 		} else {
-			*map_x = int(view_x + (screen_x * zoom)) / 32;
+			*map_x = int(view_x + (screen_x * GetZoomPublic())) / 32;
 		}
 
 		if (screen_y < 0) {
 			*map_y = (view_y + screen_y) / 32;
 		} else {
-			*map_y = int(view_y + (screen_y * zoom)) / 32;
+			*map_y = int(view_y + (screen_y * GetZoomPublic())) / 32;
 		}
 
-		if (floor <= 7) {
-			*map_x += 7 - floor;
-			*map_y += 7 - floor;
+		if (GetFloorPublic() <= 7) {
+			*map_x += 7 - GetFloorPublic();
+			*map_y += 7 - GetFloorPublic();
 		}
 	}
 
@@ -254,9 +254,9 @@ public:
 			height = 300;
 		}
 
-		view_x = (x * 32) - (width * zoom) / 2;
-		view_y = (y * 32) - (height * zoom) / 2;
-		floor = z;
+		view_x = (x * 32) - (width * GetZoomPublic()) / 2;
+		view_y = (y * 32) - (height * GetZoomPublic()) / 2;
+		SetFloorPublic(z);
 		Refresh();
 	}
 
@@ -296,7 +296,7 @@ public:
 		client_h = h;
 
 		// Auto-resize the window to fit the new client dimensions
-		int tile_pixel_size = static_cast<int>(32 / zoom);
+		int tile_pixel_size = static_cast<int>(32 / GetZoomPublic());
 		int req_w = w * tile_pixel_size;
 		int req_h = h * tile_pixel_size;
 
@@ -336,13 +336,13 @@ public:
 	int GetMapX() {
 		wxSize size = GetClientSize();
 		int width = size.GetWidth() > 0 ? size.GetWidth() : 400;
-		return (view_x + (width * (double)zoom) / 2.0) / 32;
+		return (view_x + (width * GetZoomPublic()) / 2.0) / 32;
 	}
 
 	int GetMapY() {
 		wxSize size = GetClientSize();
 		int height = size.GetHeight() > 0 ? size.GetHeight() : 300;
-		return (view_y + (height * (double)zoom) / 2.0) / 32;
+		return (view_y + (height * GetZoomPublic()) / 2.0) / 32;
 	}
 
 	int GetClientWidth() const override {

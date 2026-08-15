@@ -1,21 +1,33 @@
 ```
-# Build artifacts and temporary files
-build/
+# Compiled and build artifacts
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
+# Dependencies
+node_modules/
+venv/
+.venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+target/
+.gradle/
+
+# Logs and temp files
 *.log
-*.bin
 *.tmp
+*.swp
 
-# Dependencies downloaded by CMake FetchContent
-_deps/
+# Editors
+.vscode/
+.idea/
 
-# CMake build system files
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-
-# Compressed archives
-*.tar.xz
-*.tar.gz
-
+# System files
+.DS_Store
+Thumbs.db
 ```

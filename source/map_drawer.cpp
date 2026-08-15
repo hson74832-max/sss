@@ -118,7 +118,7 @@ bool DrawingOptions::isDrawLight() const noexcept {
 }
 
 MapDrawer::MapDrawer(MapCanvas* canvas) :
-	canvas(canvas), editor(canvas->editor) {
+	canvas(canvas), editor(canvas->GetEditorPublic()) {
 	light_drawer = std::make_shared<LightDrawer>();
 }
 
@@ -130,8 +130,8 @@ void MapDrawer::SetupVars() {
 	canvas->MouseToMap(&mouse_map_x, &mouse_map_y);
 	canvas->GetViewBox(&view_scroll_x, &view_scroll_y, &screensize_x, &screensize_y);
 
-	dragging = canvas->dragging;
-	dragging_draw = canvas->dragging_draw;
+	dragging = canvas->GetDraggingPublic();
+	dragging_draw = canvas->GetDraggingDrawPublic();
 
 	zoom = (float)canvas->GetZoom();
 	tile_size = int(TileSize / zoom); // after zoom
@@ -747,9 +747,9 @@ void MapDrawer::DrawDraggingShadow() {
 			Position pos = tile->getPosition();
 
 			int move_x, move_y, move_z;
-			move_x = canvas->drag_start_x - mouse_map_x;
-			move_y = canvas->drag_start_y - mouse_map_y;
-			move_z = canvas->drag_start_z - floor;
+			move_x = canvas->GetDragStartXPublic() - mouse_map_x;
+			move_y = canvas->GetDragStartYPublic() - mouse_map_y;
+			move_z = canvas->GetDragStartZPublic() - floor;
 
 			pos.x -= move_x;
 			pos.y -= move_y;
@@ -848,10 +848,10 @@ void MapDrawer::DrawSelectionBox() {
 
 	// Draw bounding box
 
-	int last_click_rx = canvas->last_click_abs_x - view_scroll_x;
-	int last_click_ry = canvas->last_click_abs_y - view_scroll_y;
-	double cursor_rx = canvas->cursor_x * zoom;
-	double cursor_ry = canvas->cursor_y * zoom;
+	int last_click_rx = canvas->GetLastClickAbsXPublic() - view_scroll_x;
+	int last_click_ry = canvas->GetLastClickAbsYPublic() - view_scroll_y;
+	double cursor_rx = canvas->GetCursorXPublic() * zoom;
+	double cursor_ry = canvas->GetCursorYPublic() * zoom;
 
 	double lines[4][4];
 
@@ -962,10 +962,10 @@ void MapDrawer::DrawBrush() {
 		ASSERT(brush->canDrag());
 
 		if (brush->isWall()) {
-			int last_click_start_map_x = std::min(canvas->last_click_map_x, mouse_map_x);
-			int last_click_start_map_y = std::min(canvas->last_click_map_y, mouse_map_y);
-			int last_click_end_map_x = std::max(canvas->last_click_map_x, mouse_map_x) + 1;
-			int last_click_end_map_y = std::max(canvas->last_click_map_y, mouse_map_y) + 1;
+			int last_click_start_map_x = std::min(canvas->GetLastClickMapXPublic(), mouse_map_x);
+			int last_click_start_map_y = std::min(canvas->GetLastClickMapYPublic(), mouse_map_y);
+			int last_click_end_map_x = std::max(canvas->GetLastClickMapXPublic(), mouse_map_x) + 1;
+			int last_click_end_map_y = std::max(canvas->GetLastClickMapYPublic(), mouse_map_y) + 1;
 
 			int last_click_start_sx = last_click_start_map_x * TileSize - view_scroll_x - getFloorAdjustment(floor);
 			int last_click_start_sy = last_click_start_map_y * TileSize - view_scroll_y - getFloorAdjustment(floor);
@@ -1015,18 +1015,18 @@ void MapDrawer::DrawBrush() {
 					int start_x, end_x;
 					int start_y, end_y;
 
-					if (mouse_map_x < canvas->last_click_map_x) {
+					if (mouse_map_x < canvas->GetLastClickMapXPublic()) {
 						start_x = mouse_map_x;
-						end_x = canvas->last_click_map_x;
+						end_x = canvas->GetLastClickMapXPublic();
 					} else {
-						start_x = canvas->last_click_map_x;
+						start_x = canvas->GetLastClickMapXPublic();
 						end_x = mouse_map_x;
 					}
-					if (mouse_map_y < canvas->last_click_map_y) {
+					if (mouse_map_y < canvas->GetLastClickMapYPublic()) {
 						start_y = mouse_map_y;
-						end_y = canvas->last_click_map_y;
+						end_y = canvas->GetLastClickMapYPublic();
 					} else {
-						start_y = canvas->last_click_map_y;
+						start_y = canvas->GetLastClickMapYPublic();
 						end_y = mouse_map_y;
 					}
 
@@ -1047,10 +1047,10 @@ void MapDrawer::DrawBrush() {
 						}
 					}
 				} else {
-					int last_click_start_map_x = std::min(canvas->last_click_map_x, mouse_map_x);
-					int last_click_start_map_y = std::min(canvas->last_click_map_y, mouse_map_y);
-					int last_click_end_map_x = std::max(canvas->last_click_map_x, mouse_map_x) + 1;
-					int last_click_end_map_y = std::max(canvas->last_click_map_y, mouse_map_y) + 1;
+					int last_click_start_map_x = std::min(canvas->GetLastClickMapXPublic(), mouse_map_x);
+					int last_click_start_map_y = std::min(canvas->GetLastClickMapYPublic(), mouse_map_y);
+					int last_click_end_map_x = std::max(canvas->GetLastClickMapXPublic(), mouse_map_x) + 1;
+					int last_click_end_map_y = std::max(canvas->GetLastClickMapYPublic(), mouse_map_y) + 1;
 
 					int last_click_start_sx = last_click_start_map_x * TileSize - view_scroll_x - getFloorAdjustment(floor);
 					int last_click_start_sy = last_click_start_map_y * TileSize - view_scroll_y - getFloorAdjustment(floor);
@@ -1070,24 +1070,24 @@ void MapDrawer::DrawBrush() {
 				int start_x, end_x;
 				int start_y, end_y;
 				int width = std::max(
-					std::abs(std::max(mouse_map_y, canvas->last_click_map_y) - std::min(mouse_map_y, canvas->last_click_map_y)),
-					std::abs(std::max(mouse_map_x, canvas->last_click_map_x) - std::min(mouse_map_x, canvas->last_click_map_x))
+					std::abs(std::max(mouse_map_y, canvas->GetLastClickMapYPublic()) - std::min(mouse_map_y, canvas->GetLastClickMapYPublic())),
+					std::abs(std::max(mouse_map_x, canvas->GetLastClickMapXPublic()) - std::min(mouse_map_x, canvas->GetLastClickMapXPublic()))
 				);
 
-				if (mouse_map_x < canvas->last_click_map_x) {
-					start_x = canvas->last_click_map_x - width;
-					end_x = canvas->last_click_map_x;
+				if (mouse_map_x < canvas->GetLastClickMapXPublic()) {
+					start_x = canvas->GetLastClickMapXPublic() - width;
+					end_x = canvas->GetLastClickMapXPublic();
 				} else {
-					start_x = canvas->last_click_map_x;
-					end_x = canvas->last_click_map_x + width;
+					start_x = canvas->GetLastClickMapXPublic();
+					end_x = canvas->GetLastClickMapXPublic() + width;
 				}
 
-				if (mouse_map_y < canvas->last_click_map_y) {
-					start_y = canvas->last_click_map_y - width;
-					end_y = canvas->last_click_map_y;
+				if (mouse_map_y < canvas->GetLastClickMapYPublic()) {
+					start_y = canvas->GetLastClickMapYPublic() - width;
+					end_y = canvas->GetLastClickMapYPublic();
 				} else {
-					start_y = canvas->last_click_map_y;
-					end_y = canvas->last_click_map_y + width;
+					start_y = canvas->GetLastClickMapYPublic();
+					end_y = canvas->GetLastClickMapYPublic() + width;
 				}
 
 				int center_x = start_x + (end_x - start_x) / 2;

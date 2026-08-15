@@ -39,6 +39,7 @@ class MapDrawer;
 class MapCanvas : public wxGLCanvas {
 	DECLARE_CLASS(MapCanvas)
 	DECLARE_EVENT_TABLE()
+	friend class MapDrawer;  // Allow MapDrawer to access protected members
 public:
 	MapCanvas(wxWindow* parent, Editor& editor, int* attriblist);
 	virtual ~MapCanvas();
@@ -90,6 +91,65 @@ protected:
 	int keyCode;
 	wxStopWatch refresh_watch;
 	int view_scroll_x, view_scroll_y;
+
+public:
+	// Public getters/setters for protected members to allow access from Lua dialogs
+	void SetFloorPublic(int new_floor) {
+		floor = new_floor;
+	}
+	void SetZoomPublic(double value) {
+		zoom = value;
+	}
+	int GetFloorPublic() const {
+		return floor;
+	}
+	double GetZoomPublic() const {
+		return zoom;
+	}
+	Editor& GetEditorPublic() {
+		return editor;
+	}
+	bool GetDraggingPublic() const {
+		return dragging;
+	}
+	void SetDraggingPublic(bool value) {
+		dragging = value;
+	}
+	bool GetDraggingDrawPublic() const {
+		return dragging_draw;
+	}
+	int GetDragStartXPublic() const {
+		return drag_start_x;
+	}
+	int GetDragStartYPublic() const {
+		return drag_start_y;
+	}
+	int GetDragStartZPublic() const {
+		return drag_start_z;
+	}
+	void SetDragStartPublic(int x, int y, int z) {
+		drag_start_x = x;
+		drag_start_y = y;
+		drag_start_z = z;
+	}
+	int GetLastClickAbsXPublic() const {
+		return last_click_abs_x;
+	}
+	int GetLastClickAbsYPublic() const {
+		return last_click_abs_y;
+	}
+	int GetCursorXPublic() const {
+		return cursor_x;
+	}
+	int GetCursorYPublic() const {
+		return cursor_y;
+	}
+	int GetLastClickMapXPublic() const {
+		return last_click_map_x;
+	}
+	int GetLastClickMapYPublic() const {
+		return last_click_map_y;
+	}
 
 public:
 	void Refresh();
