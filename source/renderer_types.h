@@ -22,6 +22,11 @@
 #include <string>
 #include <vector>
 
+// Forward declaration for wxColour conversion (only when wxWidgets is available)
+#ifdef __WX__
+#include <wx/colour.h>
+#endif
+
 // Pure color structure without wxWidgets dependency
 struct ColorRGBA {
     uint8_t r = 0;
@@ -32,6 +37,17 @@ struct ColorRGBA {
     ColorRGBA() = default;
     ColorRGBA(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha = 255)
         : r(red), g(green), b(blue), a(alpha) {}
+
+#ifdef __WX__
+    // Conversion from wxColour
+    ColorRGBA(const wxColour& colour)
+        : r(colour.Red()), g(colour.Green()), b(colour.Blue()), a(colour.Alpha()) {}
+    
+    // Conversion to wxColour
+    operator wxColour() const {
+        return wxColour(r, g, b, a);
+    }
+#endif
 
     bool operator==(const ColorRGBA& other) const {
         return r == other.r && g == other.g && b == other.b && a == other.a;

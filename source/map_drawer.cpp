@@ -2163,6 +2163,10 @@ void MapDrawer::glBlitSquare(int sx, int sy, int red, int green, int blue, int a
 	glEnd();
 }
 
+void MapDrawer::glColor(const ColorRGBA& color) {
+	glColor4ub(color.r, color.g, color.b, color.a);
+}
+
 void MapDrawer::glColor(wxColor color) {
 	glColor4ub(color.Red(), color.Green(), color.Blue(), color.Alpha());
 }
