@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <wx/colour.h>
+#include "renderer_types.h"
 
 struct MapViewInfo {
 	int start_x = 0;
@@ -63,6 +64,28 @@ struct MapOverlayCommand {
 
 	std::string text;
 	wxColor color = wxColor(255, 255, 255, 255);
+	
+	// Conversion to renderer-compatible format
+	RendererOverlayCommand toRendererCommand() const {
+		RendererOverlayCommand cmd;
+		cmd.type = static_cast<RendererOverlayCommand::Type>(static_cast<int>(type));
+		cmd.screen_space = screen_space;
+		cmd.filled = filled;
+		cmd.dashed = dashed;
+		cmd.width = width;
+		cmd.x = x;
+		cmd.y = y;
+		cmd.z = z;
+		cmd.w = w;
+		cmd.h = h;
+		cmd.x2 = x2;
+		cmd.y2 = y2;
+		cmd.z2 = z2;
+		cmd.sprite_id = sprite_id;
+		cmd.text = text;
+		cmd.color = ColorRGBA(color.Red(), color.Green(), color.Blue(), color.Alpha());
+		return cmd;
+	}
 };
 
 struct MapOverlayTooltip {
@@ -71,6 +94,17 @@ struct MapOverlayTooltip {
 	int z = 0;
 	std::string text;
 	wxColor color = wxColor(255, 255, 255, 255);
+	
+	// Conversion to renderer-compatible format
+	RendererOverlayTooltip toRendererTooltip() const {
+		RendererOverlayTooltip tooltip;
+		tooltip.x = x;
+		tooltip.y = y;
+		tooltip.z = z;
+		tooltip.text = text;
+		tooltip.color = ColorRGBA(color.Red(), color.Green(), color.Blue(), color.Alpha());
+		return tooltip;
+	}
 };
 
 struct MapOverlayHoverState {
