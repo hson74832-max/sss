@@ -49,6 +49,28 @@ private:
 	uint32_t m_frame_count;
 	wxLongLong m_fps_timer;
 
+public:
+	void Refresh();
+	virtual void ScreenToMap(int screen_x, int screen_y, int* map_x, int* map_y);
+	virtual void GetScreenCenter(int* map_x, int* map_y);
+	virtual int GetClientWidth() const {
+	virtual int GetClientHeight() const {
+	void StartPasting();
+	void EndPasting();
+	void EnterSelectionMode();
+	void EnterDrawingMode();
+	void UpdatePositionStatus(int x = -1, int y = -1);
+	void UpdateZoomStatus();
+	void ChangeFloor(int new_floor);
+	void SetFloor(int new_floor) {
+	int GetFloor() const {
+	double GetZoom() const {
+	virtual void SetZoom(double value);
+	virtual void GetViewBox(int* view_scroll_x, int* view_scroll_y, int* screensize_x, int* screensize_y) const;
+	virtual Position GetCursorPosition() const;
+	void TakeScreenshot(wxFileName path, wxString format);
+        void MouseToMap(int* map_x, int* map_y) {
+
 	void OnMouseMove(wxMouseEvent& event);
 	void OnMouseLeftRelease(wxMouseEvent& event);
 	void OnMouseLeftClick(wxMouseEvent& event);
@@ -102,123 +124,6 @@ private:
 	// ---
 	void OnProperties(wxCommandEvent& event);
 	void OnScriptMenu(wxCommandEvent& event);
-
-	void Refresh();
-
-	virtual void ScreenToMap(int screen_x, int screen_y, int* map_x, int* map_y);
-	void MouseToMap(int* map_x, int* map_y) {
-		ScreenToMap(cursor_x, cursor_y, map_x, map_y);
-	}
-	virtual void GetScreenCenter(int* map_x, int* map_y);
-
-	virtual int GetClientWidth() const {
-		return ClientMapWidth;
-	}
-	virtual int GetClientHeight() const {
-		return ClientMapHeight;
-	}
-
-	void StartPasting();
-	void EndPasting();
-	void EnterSelectionMode();
-	void EnterDrawingMode();
-
-	void UpdatePositionStatus(int x = -1, int y = -1);
-	void UpdateZoomStatus();
-
-	void ChangeFloor(int new_floor);
-	void SetFloor(int new_floor) {
-		floor = new_floor;
-	}
-	int GetFloor() const {
-		return floor;
-	}
-	double GetZoom() const {
-		return zoom;
-	}
-	virtual void SetZoom(double value);
-	virtual void GetViewBox(int* view_scroll_x, int* view_scroll_y, int* screensize_x, int* screensize_y) const;
-
-	virtual Position GetCursorPosition() const;
-
-	void TakeScreenshot(wxFileName path, wxString format);
-
-protected:
-	void getTilesToDraw(int mouse_map_x, int mouse_map_y, int floor, PositionVector* tilestodraw, PositionVector* tilestoborder, bool fill = false);
-	bool floodFill(Map* map, const Position& center, int x, int y, GroundBrush* brush, PositionVector* positions);
-
-protected:
-	enum {
-		BLOCK_SIZE = 100
-	};
-
-	inline int getFillIndex(int x, int y) const {
-		return x + BLOCK_SIZE * y;
-	}
-
-	static bool processed[BLOCK_SIZE * BLOCK_SIZE];
-
-	Editor& editor;
-	MapDrawer* drawer;
-	int keyCode;
-	int countMaxFills = 0;
-
-	// View related
-	int floor;
-	double zoom;
-	int cursor_x;
-	int cursor_y;
-
-	bool dragging;
-	bool boundbox_selection;
-	bool screendragging;
-	bool isPasting() const;
-	bool drawing;
-	bool dragging_draw;
-	bool replace_dragging;
-
-	uint8_t* screenshot_buffer;
-
-	int drag_start_x;
-	int drag_start_y;
-	int drag_start_z;
-
-	int last_cursor_map_x;
-	int last_cursor_map_y;
-	int last_cursor_map_z;
-
-	int last_click_map_x;
-	int last_click_map_y;
-	int last_click_map_z;
-	int last_click_abs_x;
-	int last_click_abs_y;
-	int last_click_x;
-	int last_click_y;
-
-	int last_mmb_click_x;
-	int last_mmb_click_y;
-
-	int view_scroll_x;
-	int view_scroll_y;
-
-	uint32_t current_house_id;
-
-	wxStopWatch refresh_watch;
-	MapPopupMenu* popup_menu;
-	AnimationTimer* animation_timer;
-
-	friend class MapDrawer;
-
-	DECLARE_EVENT_TABLE()
-};
-
-// Right-click popup menu
-class MapPopupMenu : public wxMenu {
-public:
-	MapPopupMenu(Editor& editor);
-	virtual ~MapPopupMenu();
-
-	void Update();
 
 protected:
 	Editor& editor;

@@ -269,7 +269,10 @@ void MapCanvas::OnPaint(wxPaintEvent& event) {
 
 	// Send newd node requests
 	editor.SendNodeRequests();
-\n\t// Update and draw FPS counter\n\tUpdateFPS();\n\tDrawFPS();
+
+        // Update and draw FPS counter
+        UpdateFPS();
+        DrawFPS();
 }
 
 void MapCanvas::TakeScreenshot(wxFileName path, wxString format) {
