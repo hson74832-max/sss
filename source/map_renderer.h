@@ -144,6 +144,15 @@ private:
     void renderHouses(const IMapRenderDataSource* map_data, const RenderViewInfo& view_info);
     void renderWaypoints(const IMapRenderDataSource* map_data, const RenderViewInfo& view_info);
     
+    // Helper methods for tile/item rendering
+    void BlitItem(int& draw_x, int& draw_y, const Tile* tile, Item* item, 
+                  bool ephemeral, int red, int green, int blue, int alpha,
+                  const IMapRenderDataSource* map_data);
+    void BlitCreature(int screenx, int screeny, const Creature* creature, 
+                      int red, int green, int blue, int alpha,
+                      const IMapRenderDataSource* map_data);
+    void glBlitTexture(int sx, int sy, int texture_number, int red, int green, int blue, int alpha);
+    
     // Helper methods
     void worldToScreen(int world_x, int world_y, const RenderViewInfo& view_info, int& screen_x, int& screen_y);
     bool isVisible(int world_x, int world_y, const RenderViewInfo& view_info);

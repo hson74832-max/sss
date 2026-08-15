@@ -181,7 +181,6 @@ protected:
 	void glBlitTexture(int sx, int sy, int texture_number, int red, int green, int blue, int alpha);
 	void glBlitSquare(int sx, int sy, int red, int green, int blue, int alpha, int size = 0);
 	void glColor(const ColorRGBA& color);
-	void glColor(wxColor color);
 	void glColor(BrushColor color);
 	void glColorCheck(Brush* brush, const Position& pos);
 	void drawRect(int x, int y, int w, int h, const ColorRGBA& color, int width = 1);

@@ -1,4 +1,14 @@
 #include "map_renderer.h"
+#include "graphics.h"
+#include "sprites.h"
+#include "tile.h"
+#include "creature.h"
+#include "spawn.h"
+#include "house.h"
+#include "waypoints.h"
+#include "items.h"
+#include "item.h"
+#include "map.h"
 #include <GL/glew.h>
 #include <cmath>
 
@@ -147,29 +157,186 @@ void MapRenderer::setTextRenderCallback(TextRenderCallback callback)
 
 void MapRenderer::renderMapTiles(const IMapRenderDataSource* map_data, const RenderViewInfo& view_info)
 {
-    // Delegate to existing tile rendering logic from MapDrawer
-    // This will be refactored to use pure OpenGL without wxWidgets dependencies
-    // For now, we'll use the existing MapDrawer helpers
-    
+    if (!map_data) {
+        return;
+    }
+
     int start_x = view_info.world_left;
     int end_x = view_info.world_right;
     int start_y = view_info.world_top;
     int end_y = view_info.world_bottom;
 
+    glEnable(GL_TEXTURE_2D);
+    
     for (int y = start_y; y < end_y; ++y) {
         for (int x = start_x; x < end_x; ++x) {
-            const Tile* tile = map_data->getTile(x, y);
-            if (tile) {
-                // Render tile using existing logic
-                // This needs to be refactored to pure OpenGL
-                int screen_x, screen_y;
-                worldToScreen(x, y, view_info, screen_x, screen_y);
-                
-                // Placeholder: actual tile rendering logic goes here
-                // Will extract from MapDrawer::DrawTile or similar
+            Tile* tile = map_data->getTile(x, y);
+            if (!tile) {
+                continue;
+            }
+
+            // Calculate screen position
+            int screen_x, screen_y;
+            worldToScreen(x, y, view_info, screen_x, screen_y);
+            
+            // Apply floor offset
+            int map_z = tile->getZ();
+            int offset;
+            if (map_z <= GROUND_LAYER) {
+                offset = (GROUND_LAYER - map_z) * 32;
+            } else {
+                offset = 32 * (view_info.floor - map_z);
+            }
+            
+            int draw_x = screen_x - offset;
+            int draw_y = screen_y - offset;
+            
+            // Render ground tile
+            if (tile->ground) {
+                int r = 255, g = 255, b = 255;
+                BlitItem(draw_x, draw_y, tile, tile->ground, false, r, g, b, 255, map_data);
+            }
+            
+            // Render items on tile
+            for (Item* item : tile->items) {
+                if (item->isBorder()) {
+                    BlitItem(draw_x, draw_y, tile, item, false, 255, 255, 255, 255, map_data);
+                } else {
+                    BlitItem(draw_x, draw_y, tile, item, false, 255, 255, 255, 255, map_data);
+                }
+            }
+            
+            // Render creature on tile
+            if (tile->creature) {
+                BlitCreature(draw_x, draw_y, tile->creature, 255, 255, 255, 255, map_data);
             }
         }
     }
+}
+
+// Helper method to render an item sprite
+void MapRenderer::BlitItem(int& draw_x, int& draw_y, const Tile* tile, Item* item, 
+                           bool ephemeral, int red, int green, int blue, int alpha,
+                           const IMapRenderDataSource* map_data)
+{
+    if (!item || !map_data) {
+        return;
+    }
+    
+    const Position& pos = tile->getPosition();
+    ItemType& it = g_items[item->getID()];
+    
+    GameSprite* spr = it.sprite;
+    if (!spr) {
+        return;
+    }
+    
+    int screenx = draw_x - spr->getDrawOffset().first;
+    int screeny = draw_y - spr->getDrawOffset().second;
+    
+    // Update drawing height
+    draw_x -= spr->getDrawHeight();
+    draw_y -= spr->getDrawHeight();
+    
+    int subtype = -1;
+    int pattern_x = pos.x % spr->pattern_x;
+    int pattern_y = pos.y % spr->pattern_y;
+    int pattern_z = pos.z % spr->pattern_z;
+    
+    // Handle special item types
+    if (it.isSplash() || it.isFluidContainer()) {
+        subtype = item->getSubtype();
+    } else if (it.isHangable) {
+        if (tile && tile->hasProperty(HOOK_SOUTH)) {
+            pattern_x = 1;
+        } else if (tile && tile->hasProperty(HOOK_EAST)) {
+            pattern_x = 2;
+        } else {
+            pattern_x = 0;
+        }
+    } else if (it.stackable) {
+        if (item->getSubtype() <= 1) {
+            subtype = 0;
+        } else if (item->getSubtype() <= 2) {
+            subtype = 1;
+        } else if (item->getSubtype() <= 3) {
+            subtype = 2;
+        } else if (item->getSubtype() <= 4) {
+            subtype = 3;
+        } else if (item->getSubtype() < 10) {
+            subtype = 4;
+        } else if (item->getSubtype() < 25) {
+            subtype = 5;
+        } else if (item->getSubtype() < 50) {
+            subtype = 6;
+        } else {
+            subtype = 7;
+        }
+    }
+    
+    int frame = item->getFrame();
+    
+    for (int cx = 0; cx != spr->width; cx++) {
+        for (int cy = 0; cy != spr->height; cy++) {
+            for (int cf = 0; cf != spr->layers; cf++) {
+                int texnum = spr->getHardwareID(cx, cy, cf, subtype, pattern_x, pattern_y, pattern_z, frame);
+                
+                if (texnum >= 0) {
+                    glBlitTexture(screenx + cx * 32, screeny + cy * 32, texnum, red, green, blue, alpha);
+                }
+            }
+        }
+    }
+}
+
+// Helper method to render a creature
+void MapRenderer::BlitCreature(int screenx, int screeny, const Creature* creature, 
+                               int red, int green, int blue, int alpha,
+                               const IMapRenderDataSource* map_data)
+{
+    if (!creature || !map_data) {
+        return;
+    }
+    
+    Outfit outfit = creature->getOutfit();
+    Direction dir = creature->getDirection();
+    
+    // Get creature sprite and render
+    GameSprite* spr = g_items.getCreatureSprite(creature->getID());
+    if (spr) {
+        int frame = creature->getFrame();
+        int pattern_x = 0;
+        int pattern_y = 0;
+        int pattern_z = 0;
+        
+        for (int cx = 0; cx != spr->width; cx++) {
+            for (int cy = 0; cy != spr->height; cy++) {
+                for (int cf = 0; cf != spr->layers; cf++) {
+                    int texnum = spr->getHardwareID(cx, cy, cf, -1, pattern_x, pattern_y, pattern_z, frame);
+                    if (texnum >= 0) {
+                        glBlitTexture(screenx + cx * 32, screeny + cy * 32, texnum, red, green, blue, alpha);
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Helper method to blit a texture
+void MapRenderer::glBlitTexture(int sx, int sy, int texture_number, int red, int green, int blue, int alpha)
+{
+    glBindTexture(GL_TEXTURE_2D, texture_number);
+    
+    glColor4ub(red, green, blue, alpha);
+    
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f); glVertex2i(sx, sy);
+    glTexCoord2f(1.0f, 0.0f); glVertex2i(sx + 32, sy);
+    glTexCoord2f(1.0f, 1.0f); glVertex2i(sx + 32, sy + 32);
+    glTexCoord2f(0.0f, 1.0f); glVertex2i(sx, sy + 32);
+    glEnd();
+    
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void MapRenderer::renderGrid(const RenderViewInfo& view_info, const RenderSettings& settings)
