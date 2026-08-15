@@ -82,7 +82,7 @@ struct MapOverlayCommand {
 		cmd.z2 = z2;
 		cmd.sprite_id = sprite_id;
 		cmd.text = text;
-		cmd.color = ColorRGBA(color.Red(), color.Green(), color.Blue(), color.Alpha());
+		cmd.color = color;
 		return cmd;
 	}
 };
@@ -101,7 +101,7 @@ struct MapOverlayTooltip {
 		tooltip.y = y;
 		tooltip.z = z;
 		tooltip.text = text;
-		tooltip.color = ColorRGBA(color.Red(), color.Green(), color.Blue(), color.Alpha());
+		tooltip.color = color;
 		return tooltip;
 	}
 };
