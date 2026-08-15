@@ -22,6 +22,9 @@ enum class Direction;
 struct Position;
 struct ItemType;
 enum class TileLocation;
+class GameSprite;
+class GraphicManager;
+class QTreeNode;
 
 // Pure data structures for rendering state
 // These contain ONLY data needed for rendering, no GUI logic
@@ -38,6 +41,12 @@ struct RenderViewInfo {
     int world_top;
     int world_right;
     int world_bottom;
+    
+    // Floor information
+    int floor;
+    int start_z;
+    int end_z;
+    int superend_z;
 };
 
 struct RenderSettings {
@@ -50,6 +59,15 @@ struct RenderSettings {
     bool show_debug_text;
     bool highlight_selected_tiles;
     bool highlight_drag_area;
+    bool transparent_floors;
+    bool transparent_items;
+    bool show_shade;
+    bool show_all_floors;
+    bool show_blocking;
+    bool show_hooks;
+    bool hide_items_when_zoomed;
+    bool show_only_colors;
+    bool show_preview;
     
     ColorRGBA grid_color;
     ColorRGBA selection_color;
@@ -81,6 +99,10 @@ public:
     
     virtual int getWidth() const = 0;
     virtual int getHeight() const = 0;
+    
+    // Additional methods for detailed tile rendering
+    virtual QTreeNode* getLeaf(int x, int y) = 0;
+    virtual GraphicManager& getGraphics() = 0;
 };
 
 // Main OpenGL Renderer Class

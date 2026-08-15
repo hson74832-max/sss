@@ -1,7 +1,12 @@
 #include "map_renderer.h"
-#include "map_drawer.h" // For tile rendering helpers - will be refactored later
 #include <GL/glew.h>
 #include <cmath>
+
+#ifdef __APPLE__
+	#include <GLUT/glut.h>
+#else
+	#include <GL/glut.h>
+#endif
 
 MapRenderer::MapRenderer()
     : m_initialized(false)
