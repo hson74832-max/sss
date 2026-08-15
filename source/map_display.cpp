@@ -52,6 +52,12 @@
 #include "lua/lua_script_manager.h"
 #include "table_brush.h"
 
+#ifdef __APPLE__
+	#include <GLUT/glut.h>
+#else
+	#include <GL/glut.h>
+#endif
+
 BEGIN_EVENT_TABLE(MapCanvas, wxGLCanvas)
 EVT_KEY_DOWN(MapCanvas::OnKeyDown)
 EVT_KEY_DOWN(MapCanvas::OnKeyUp)
