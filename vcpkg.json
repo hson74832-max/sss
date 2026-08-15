@@ -1,0 +1,30 @@
+{
+	"$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+	"dependencies": [
+		"wxwidgets",
+		"freeglut",
+		"asio",
+		"nlohmann-json",
+		"fmt",
+		{
+			"name": "libiconv",
+			"platform": "osx"
+		},
+		"libarchive",
+		"boost-spirit",
+		"boost-asio",
+		"lua",
+		"sol2",
+		"cpr",
+		"boost-system",
+		"boost-thread",
+		"zlib"
+	],
+	"overrides": [
+  {
+    "name": "lua",
+    "version-string": "5.4.8"
+  }
+],
+	"builtin-baseline": "734f8130ffe2f02cf855a3a42a2958f01b3fb005"
+}
