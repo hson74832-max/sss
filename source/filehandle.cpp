@@ -170,7 +170,9 @@ void MemoryNodeFileReadHandle::assign(const uint8_t* data, size_t size) {
 	freeNode(root_node);
 	root_node = nullptr;
 	// Highly volatile, but we know we're not gonna modify
-	cache = const_cast<uint8_t*>(data);
+	// We don't own this memory, so we just store the raw pointer
+	cache.reset(nullptr);
+	index = const_cast<uint8_t*>(data);
 	cache_size = cache_length = size;
 	local_read_index = 0;
 }
@@ -193,6 +195,7 @@ BinaryNode* MemoryNodeFileReadHandle::getRootNode() {
 	local_read_index++; // Skip first NODE_START
 	last_was_start = true;
 	root_node = getNode(nullptr);
+	// For MemoryNodeFileReadHandle, we use 'index' instead of cache
 	root_node->load();
 	return root_node;
 }
@@ -361,12 +364,56 @@ BinaryNode* BinaryNode::advance() {
 		child->advance();
 	}
 
+	// Check if this is a MemoryNodeFileReadHandle
+	auto* memFile = dynamic_cast<MemoryNodeFileReadHandle*>(file);
+	if (memFile) {
+		// Memory-based file handle
+		if (file->last_was_start) {
+			return nullptr;
+		} else {
+			// Last was end (0xff)
+			// Read next byte to decide if there is another node following this
+			const uint8_t* buffer = memFile->index;
+			size_t buffer_size = memFile->cache_size;
+			size_t& local_read_index = file->local_read_index;
+
+			if (local_read_index >= buffer_size) {
+				// End of buffer
+				parent->child = nullptr;
+				file->freeNode(this);
+				return nullptr;
+			}
+
+			uint8_t op = buffer[local_read_index];
+			++local_read_index;
+
+			if (op == NODE_START) {
+				// Another node follows this.
+				// Load this node as the next one
+				read_offset = 0;
+				data.clear();
+				load();
+				return this;
+			} else if (op == NODE_END) {
+				// End of this child-tree
+				parent->child = nullptr;
+				file->last_was_start = false;
+				file->freeNode(this);
+				return nullptr;
+			} else {
+				file->error_code = FILE_SYNTAX_ERROR;
+				return nullptr;
+			}
+		}
+	}
+	
+	// Disk-based file handle
 	if (file->last_was_start) {
 		return nullptr;
 	} else {
 		// Last was end (0xff)
 		// Read next byte to decide if there is another node following this
-		uint8_t*& cache = file->cache;
+		uint8_t* cache = file->cache.get();
 		size_t& cache_length = file->cache_length;
 		size_t& local_read_index = file->local_read_index;
 
@@ -377,6 +424,7 @@ BinaryNode* BinaryNode::advance() {
 				file->freeNode(this);
 				return nullptr;
 			}
+			cache = file->cache.get();
 		}
 
 		uint8_t op = cache[local_read_index];
@@ -404,21 +452,69 @@ BinaryNode* BinaryNode::advance() {
 
 void BinaryNode::load() {
 	ASSERT(file);
+	
+	// For MemoryNodeFileReadHandle, use 'index' instead of cache
+	auto* memFile = dynamic_cast<MemoryNodeFileReadHandle*>(file);
+	if (memFile) {
+		// Memory-based file handle - read directly from the provided buffer
+		const uint8_t* buffer = memFile->index;
+		size_t buffer_size = memFile->cache_size;
+		while (local_read_index < buffer_size) {
+			uint8_t op = buffer[local_read_index];
+			++local_read_index;
+
+			switch (op) {
+				case NODE_START: {
+					file->last_was_start = true;
+					return;
+				}
+
+				case NODE_END: {
+					file->last_was_start = false;
+					return;
+				}
+
+				case ESCAPE_CHAR: {
+					if (local_read_index >= buffer_size) {
+						file->error_code = FILE_PREMATURE_END;
+						return;
+					}
+					op = buffer[local_read_index];
+					++local_read_index;
+					break;
+				}
+
+				default:
+					break;
+			}
+			data.append(1, op);
+		}
+		file->error_code = FILE_PREMATURE_END;
+		return;
+	}
+	
+	// Disk-based file handle - use cache
+	auto* diskFile = dynamic_cast<DiskNodeFileReadHandle*>(file);
+	if (!diskFile) {
+		return; // Unknown file type
+	}
+	
 	// Read until next node starts
-	uint8_t*& cache = file->cache;
+	uint8_t* cache = file->cache.get();
 	size_t& cache_length = file->cache_length;
-	size_t& local_read_index = file->local_read_index;
+	size_t& local_read_index_ref = file->local_read_index;
 	while (true) {
-		if (local_read_index >= cache_length) {
+		if (local_read_index_ref >= cache_length) {
 			if (!file->renewCache()) {
 				// Failed to renew, exit
 				file->error_code = FILE_PREMATURE_END;
 				return;
 			}
+			cache = file->cache.get();
 		}
 
-		uint8_t op = cache[local_read_index];
-		++local_read_index;
+		uint8_t op = cache[local_read_index_ref];
+		++local_read_index_ref;
 
 		switch (op) {
 			case NODE_START: {
@@ -432,16 +528,17 @@ void BinaryNode::load() {
 			}
 
 			case ESCAPE_CHAR: {
-				if (local_read_index >= cache_length) {
+				if (local_read_index_ref >= cache_length) {
 					if (!file->renewCache()) {
 						// Failed to renew, exit
 						file->error_code = FILE_PREMATURE_END;
 						return;
 					}
+					cache = file->cache.get();
 				}
 
-				op = cache[local_read_index];
-				++local_read_index;
+				op = cache[local_read_index_ref];
+				++local_read_index_ref;
 				break;
 			}
 
