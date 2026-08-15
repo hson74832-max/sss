@@ -230,6 +230,7 @@ void Settings::IO(IOMode mode) {
 	Int(SHOW_TOWNS, 0);
 	Int(ALWAYS_SHOW_ZONES, 1);
 	Int(EXT_HOUSE_SHADER, 1);
+	Int(SHOW_FPS, 1);
 
 	section("Version");
 	Int(VERSION_ID, 0);
