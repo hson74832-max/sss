@@ -20,6 +20,7 @@
 
 #include "main.h"
 #include "position.h"
+#include "renderer_types.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <cmath>
