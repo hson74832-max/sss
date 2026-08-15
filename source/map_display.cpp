@@ -2840,25 +2840,47 @@ m_fps_timer = current_time;
 
 void MapCanvas::DrawFPS() {
 	if (!g_settings.getBoolean(Config::SHOW_FPS)) {
-		m_overlay.Reset();
 		return;
 	}
 
-	wxClientDC dc(this);
-	wxDCOverlay odc(m_overlay, &dc);
-	odc.Clear();
+	// Draw FPS using OpenGL for better reliability and consistency
+	SetCurrent(*g_gui.GetGLContext(this));
 
-	dc.SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
-	dc.SetTextForeground(*wxGREEN);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
 
 	int width, height;
 	GetSize(&width, &height);
+	glOrtho(0, width, height, 0, -1, 1);
 
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_BLEND);
+
+	// Draw FPS text using OpenGL bitmap fonts
+	glColor3f(0.0f, 1.0f, 0.0f); // Green color
 	wxString fps_text;
 	fps_text.Printf(wxT("FPS: %.1f"), m_fps);
 
-	int text_width, text_height;
+	int text_width = 0;
+	int text_height = 0;
+	wxClientDC dc(this);
 	dc.GetTextExtent(fps_text, &text_width, &text_height);
 
-	dc.DrawText(fps_text, width - text_width - 10, 10);
+	int x_pos = width - text_width - 10;
+	int y_pos = 10 + text_height; // OpenGL coordinates are from bottom
+
+	glRasterPos2i(x_pos, y_pos);
+	for (const wxChar& c : fps_text) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, c);
+	}
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
 }
