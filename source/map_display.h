@@ -58,6 +58,7 @@ private:
 	wxLongLong m_last_time;
 	uint32_t m_frame_count;
 	wxLongLong m_fps_timer;
+	wxOverlay m_overlay;
 
 protected:
 	// State variables - protected for access by derived classes and MapDrawer

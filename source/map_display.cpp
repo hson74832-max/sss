@@ -165,6 +165,7 @@ MapCanvas::~MapCanvas() {
 	delete popup_menu;
 	delete animation_timer;
 	delete drawer;
+	m_overlay.Reset();
 	free(screenshot_buffer);
 }
 
@@ -2839,14 +2840,12 @@ m_fps_timer = current_time;
 
 void MapCanvas::DrawFPS() {
 	if (!g_settings.getBoolean(Config::SHOW_FPS)) {
+		m_overlay.Reset();
 		return;
 	}
 
 	wxClientDC dc(this);
-	wxOverlay overlay;
-	overlay.Reset();
-
-	wxDCOverlay odc(overlay, &dc);
+	wxDCOverlay odc(m_overlay, &dc);
 	odc.Clear();
 
 	dc.SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
