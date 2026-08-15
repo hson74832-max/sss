@@ -20,7 +20,6 @@
 
 #include <string>
 #include <vector>
-#include <wx/colour.h>
 #include "renderer_types.h"
 
 struct MapViewInfo {
@@ -63,7 +62,7 @@ struct MapOverlayCommand {
 	uint32_t sprite_id = 0;
 
 	std::string text;
-	wxColor color = wxColor(255, 255, 255, 255);
+	ColorRGBA color = ColorRGBA(255, 255, 255, 255);
 	
 	// Conversion to renderer-compatible format
 	RendererOverlayCommand toRendererCommand() const {
@@ -93,7 +92,7 @@ struct MapOverlayTooltip {
 	int y = 0;
 	int z = 0;
 	std::string text;
-	wxColor color = wxColor(255, 255, 255, 255);
+	ColorRGBA color = ColorRGBA(255, 255, 255, 255);
 	
 	// Conversion to renderer-compatible format
 	RendererOverlayTooltip toRendererTooltip() const {

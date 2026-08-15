@@ -26,7 +26,7 @@ static std::vector<uint8_t> s_light_buffer;
 
 LightDrawer::LightDrawer() {
 	texture = 0;
-	global_color = wxColor(50, 50, 50, 255);
+	global_color = ColorRGBA(50, 50, 50, 255);
 	// Pre-allocate a reasonable buffer size (e.g., for 512x512 light map)
 	s_light_buffer.reserve(512 * 512 * PixelFormatRGBA);
 }
@@ -58,20 +58,20 @@ void LightDrawer::draw(int map_x, int map_y, int end_x, int end_y, int scroll_x,
 			int index = (y * w + x);
 			int color_index = index * PixelFormatRGBA;
 
-			s_light_buffer[color_index] = global_color.Red();
-			s_light_buffer[color_index + 1] = global_color.Green();
-			s_light_buffer[color_index + 2] = global_color.Blue();
-			s_light_buffer[color_index + 3] = 140; // global_color.Alpha();
+			s_light_buffer[color_index] = global_color.r;
+			s_light_buffer[color_index + 1] = global_color.g;
+			s_light_buffer[color_index + 2] = global_color.b;
+			s_light_buffer[color_index + 3] = 140; // global_color.a;
 
 			for (auto& light : lights) {
 				float intensity = calculateIntensity(mx, my, light);
 				if (intensity == 0.f) {
 					continue;
 				}
-				wxColor light_color = colorFromEightBit(light.color);
-				uint8_t red = static_cast<uint8_t>(light_color.Red() * intensity);
-				uint8_t green = static_cast<uint8_t>(light_color.Green() * intensity);
-				uint8_t blue = static_cast<uint8_t>(light_color.Blue() * intensity);
+				ColorRGBA light_color = colorFromEightBitRGBA(light.color);
+				uint8_t red = static_cast<uint8_t>(light_color.r * intensity);
+				uint8_t green = static_cast<uint8_t>(light_color.g * intensity);
+				uint8_t blue = static_cast<uint8_t>(light_color.b * intensity);
 				s_light_buffer[color_index] = std::max(s_light_buffer[color_index], red);
 				s_light_buffer[color_index + 1] = std::max(s_light_buffer[color_index + 1], green);
 				s_light_buffer[color_index + 2] = std::max(s_light_buffer[color_index + 2], blue);
@@ -124,7 +124,7 @@ void LightDrawer::draw(int map_x, int map_y, int end_x, int end_y, int scroll_x,
 }
 
 void LightDrawer::setGlobalLightColor(uint8_t color) {
-	global_color = colorFromEightBit(color);
+	global_color = colorFromEightBitRGBA(color);
 }
 
 void LightDrawer::addLight(int map_x, int map_y, int map_z, const SpriteLight& light) {

@@ -78,6 +78,7 @@ bool posFromClipboard(Position& position, const int mapWidth = MAP_MAX_WIDTH, co
 wxString b2yn(bool v);
 
 wxColor colorFromEightBit(int color);
+ColorRGBA colorFromEightBitRGBA(int color);
 
 // Standard math functions
 template <class T>
