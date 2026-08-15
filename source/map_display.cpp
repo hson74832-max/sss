@@ -20,6 +20,7 @@
 #include <sstream>
 #include <time.h>
 #include <wx/wfstream.h>
+#include <wx/overlay.h>
 
 #include "gui.h"
 #include "editor.h"
@@ -141,7 +142,12 @@ MapCanvas::MapCanvas(wxWindow* parent, Editor& editor, int* attriblist) :
 	last_click_y(-1),
 
 	last_mmb_click_x(-1),
-	last_mmb_click_y(-1) {
+	last_mmb_click_y(-1),
+
+	m_fps(0.0),
+	m_last_time(wxGetUTCTimeMillis()),
+	m_frame_count(0),
+	m_fps_timer(wxGetUTCTimeMillis()) {
 	popup_menu = newd MapPopupMenu(editor);
 	animation_timer = newd AnimationTimer(this);
 	drawer = new MapDrawer(this);
@@ -263,6 +269,7 @@ void MapCanvas::OnPaint(wxPaintEvent& event) {
 
 	// Send newd node requests
 	editor.SendNodeRequests();
+\n\t// Update and draw FPS counter\n\tUpdateFPS();\n\tDrawFPS();
 }
 
 void MapCanvas::TakeScreenshot(wxFileName path, wxString format) {
@@ -2807,3 +2814,42 @@ void AnimationTimer::Stop() {
 		wxTimer::Stop();
 	}
 };
+
+void MapCanvas::UpdateFPS() {
+m_frame_count++;
+wxLongLong current_time = wxGetUTCTimeMillis();
+wxLongLong elapsed = current_time - m_fps_timer;
+
+if (elapsed >= 500) { // Update FPS every 500ms
+m_fps = (double)m_frame_count * 1000.0 / (double)elapsed.ToLong();
+m_frame_count = 0;
+m_fps_timer = current_time;
+}
+}
+
+void MapCanvas::DrawFPS() {
+if (!g_settings.getBoolean(Config::SHOW_FPS)) {
+return;
+}
+
+wxClientDC dc(this);
+wxOverlay overlay;
+overlay.Reset();
+
+wxDCOverlay odc(overlay, &dc);
+odc.Clear();
+
+dc.SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
+dc.SetTextForeground(*wxWHITE);
+
+int width, height;
+GetSize(&width, &height);
+
+wxString fps_text;
+fps_text.Printf(wxT("FPS: %.1f"), m_fps);
+
+int text_width, text_height;
+dc.GetTextExtent(fps_text, &text_width, &text_height);
+
+dc.DrawText(fps_text, width - text_width - 10, 10);
+}

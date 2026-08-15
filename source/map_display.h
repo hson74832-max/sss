@@ -39,6 +39,16 @@ public:
 	void OnPaint(wxPaintEvent& event);
 	void OnEraseBackground(wxEraseEvent& event) { }
 
+	// FPS counter
+	void UpdateFPS();
+	void DrawFPS();
+
+private:
+	double m_fps;
+	wxLongLong m_last_time;
+	uint32_t m_frame_count;
+	wxLongLong m_fps_timer;
+
 	void OnMouseMove(wxMouseEvent& event);
 	void OnMouseLeftRelease(wxMouseEvent& event);
 	void OnMouseLeftClick(wxMouseEvent& event);
