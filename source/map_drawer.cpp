@@ -681,40 +681,40 @@ void MapDrawer::DrawIngameBox() {
 
 	// left side
 	if (box_start_map_x >= start_x) {
-		drawFilledRect(0, 0, box_start_x, screensize_y * zoom, side_color);
+		drawFilledRect(0, 0, box_start_x, screensize_y * zoom, ColorRGBA(side_color.Red(), side_color.Green(), side_color.Blue(), side_color.Alpha()));
 	}
 
 	// right side
 	if (box_end_map_x < end_x) {
-		drawFilledRect(box_end_x, 0, screensize_x * zoom, screensize_y * zoom, side_color);
+		drawFilledRect(box_end_x, 0, screensize_x * zoom, screensize_y * zoom, ColorRGBA(side_color.Red(), side_color.Green(), side_color.Blue(), side_color.Alpha()));
 	}
 
 	// top side
 	if (box_start_map_y >= start_y) {
-		drawFilledRect(box_start_x, 0, box_end_x - box_start_x, box_start_y, side_color);
+		drawFilledRect(box_start_x, 0, box_end_x - box_start_x, box_start_y, ColorRGBA(side_color.Red(), side_color.Green(), side_color.Blue(), side_color.Alpha()));
 	}
 
 	// bottom side
 	if (box_end_map_y < end_y) {
-		drawFilledRect(box_start_x, box_end_y, box_end_x - box_start_x, screensize_y * zoom, side_color);
+		drawFilledRect(box_start_x, box_end_y, box_end_x - box_start_x, screensize_y * zoom, ColorRGBA(side_color.Red(), side_color.Green(), side_color.Blue(), side_color.Alpha()));
 	}
 
 	// hidden tiles
-	drawRect(box_start_x, box_start_y, box_end_x - box_start_x, box_end_y - box_start_y, *wxRED);
+	drawRect(box_start_x, box_start_y, box_end_x - box_start_x, box_end_y - box_start_y, ColorRGBA(255, 0, 0, 255));
 
 	// visible tiles
 	box_start_x += TileSize;
 	box_start_y += TileSize;
 	box_end_x -= 1 * TileSize;
 	box_end_y -= 1 * TileSize;
-	drawRect(box_start_x, box_start_y, box_end_x - box_start_x, box_end_y - box_start_y, *wxGREEN);
+	drawRect(box_start_x, box_start_y, box_end_x - box_start_x, box_end_y - box_start_y, ColorRGBA(0, 255, 0, 255));
 
 	// player position
 	box_start_x += (ClientMapWidth - 3) / 2 * TileSize;
 	box_start_y += (ClientMapHeight - 3) / 2 * TileSize;
 	box_end_x = box_start_x + TileSize;
 	box_end_y = box_start_y + TileSize;
-	drawRect(box_start_x, box_start_y, box_end_x - box_start_x, box_end_y - box_start_y, *wxGREEN);
+	drawRect(box_start_x, box_start_y, box_end_x - box_start_x, box_end_y - box_start_y, ColorRGBA(0, 255, 0, 255));
 
 	glEnable(GL_TEXTURE_2D);
 }
