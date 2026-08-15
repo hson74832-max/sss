@@ -1,1 +1,24 @@
-Nothing needs to be added to .gitignore since only a source code file (.cpp) was modified and there are no build artifacts, dependencies, or temporary files in the changes.
+```
+# Build artifacts
+build/
+cmake-build*/
+
+# Dependencies
+_deps/
+
+# Logs
+*.log
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+Makefile
+
+# Temporary files
+*.tmp
+*.swp
+
+# Generated headers
+source/renderer_types.h
+
+```
