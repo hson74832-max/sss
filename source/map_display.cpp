@@ -171,7 +171,6 @@ MapCanvas::~MapCanvas() {
 	delete popup_menu;
 	delete animation_timer;
 	delete drawer;
-	m_overlay.Reset();
 	free(screenshot_buffer);
 }
 
