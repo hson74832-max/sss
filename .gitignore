@@ -1,97 +1,45 @@
 ```cpp
-# Compiled and build artifacts
+// C++ object files
 *.o
 *.obj
-*.out
 *.so
-*.dll
 *.a
-*.lib
-*.dylib
+*.dll
 *.exe
+*.out
 
-# Build directories
+// C++ build directories
 build/
 dist/
 target/
 
-# IDE files
+// Dependencies
+node_modules/
+vendor/
+deps/
+
+// IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
-*.tmp
 
-# Logs
+// Logs and temp files
 *.log
+*.tmp
+*.temp
 
-# Environment
+// Environment
 .env
 .env.local
 *.env.*
 
-# Coverage reports
+// Coverage
 coverage/
 htmlcov/
-*.coverage
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Python specific
-__pycache__/
-*.pyc
-*.pyo
-.Python
-*.so
-*.egg-info/
-.eggs/
-
-# Node.js specific
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Java specific
-*.class
-*.jar
-*.war
-*.ear
-hs_err_pid*
-
-# C/C++ specific
-*.a
-*.la
-*.lo
-*.so
-.libs/
-!Makefile
-Makefile.in
-
-# Go specific
-*.out
-*.exe
-*.dll
-*.so
-*.dylib
-*.test
-*.prof
-
-# Rust specific
-Cargo.lock
-*.lock
-target/
-
-# Ruby specific
-*.gem
-*.rbc
-.bundle/
 .coverage
-.ruby-version
 
-# Compression archives
+// Compressed files
 *.zip
 *.gz
 *.tar
@@ -114,10 +62,4 @@ target/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-
-# Julia specific
-julia-*/
-
-# Zig specific
-zig*/
 ```

@@ -157,7 +157,7 @@ MapCanvas::MapCanvas(wxWindow* parent, Editor& editor, int* attriblist) :
 	m_fps_timer(wxGetUTCTimeMillis()) {
 	popup_menu = newd MapPopupMenu(editor);
 	animation_timer = newd AnimationTimer(this);
-	drawer = new MapDrawer(this);
+	drawer = newd MapDrawer(this);
 	keyCode = WXK_NONE;
 }
 
@@ -2838,28 +2838,28 @@ m_fps_timer = current_time;
 }
 
 void MapCanvas::DrawFPS() {
-if (!g_settings.getBoolean(Config::SHOW_FPS)) {
-return;
-}
+	if (!g_settings.getBoolean(Config::SHOW_FPS)) {
+		return;
+	}
 
-wxClientDC dc(this);
-wxOverlay overlay;
-overlay.Reset();
+	wxClientDC dc(this);
+	wxOverlay overlay;
+	overlay.Reset();
 
-wxDCOverlay odc(overlay, &dc);
-odc.Clear();
+	wxDCOverlay odc(overlay, &dc);
+	odc.Clear();
 
-dc.SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
-dc.SetTextForeground(*wxWHITE);
+	dc.SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
+	dc.SetTextForeground(*wxGREEN);
 
-int width, height;
-GetSize(&width, &height);
+	int width, height;
+	GetSize(&width, &height);
 
-wxString fps_text;
-fps_text.Printf(wxT("FPS: %.1f"), m_fps);
+	wxString fps_text;
+	fps_text.Printf(wxT("FPS: %.1f"), m_fps);
 
-int text_width, text_height;
-dc.GetTextExtent(fps_text, &text_width, &text_height);
+	int text_width, text_height;
+	dc.GetTextExtent(fps_text, &text_width, &text_height);
 
-dc.DrawText(fps_text, width - text_width - 10, 10);
+	dc.DrawText(fps_text, width - text_width - 10, 10);
 }
